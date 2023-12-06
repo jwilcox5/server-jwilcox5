@@ -138,12 +138,18 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 func statusHandler(w http.ResponseWriter, r *http.Request) {
 	svc := InitializeSess()
 
-	items, myTableName := GetTableItemsAndName(svc)
+	tableResponse, tableErr := svc.DescribeTable(&dynamodb.DescribeTableInput{
+		TableName: aws.String("air-quality-data-jwilcox5"),
+	})
 
-	recCount := int(*items.Count)
+	if tableErr != nil {
+		panic(tableErr)
+	}
+
+	recCount := int(*tableResponse.Table.ItemCount)
 
 	statusReq := StatusRequest{
-		Table:       myTableName,
+		Table:       "air-quality-data-jwilcox5",
 		RecordCount: recCount,
 	}
 
